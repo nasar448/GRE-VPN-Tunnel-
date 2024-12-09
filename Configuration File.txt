@@ -1,0 +1,90 @@
+Basic Configuration
+
+R1 
+Router>enable 
+Router#configure terminal
+ISB-Head-Office(config)#hostname ISB-Head-Office-R1
+ISB-Head-Office-R1(config)#interface g0/0
+ISB-Head-Office-R1(config-if)#no shutdown 
+ISB-Head-Office-R1(config-if)#ip address 192.168.1.100 255.255.255.0
+ISB-Head-Office-R1(config)#interface gigabitEthernet 0/1 
+ISB-Head-Office-R1(config-if)#ip address 1.1.1.1 255.0.0.0
+ISB-Head-Office-R1(config-if)#no shutdown 
+
+R2
+Router>enable 
+Router#configure terminal 
+Router(config)#hostname ISB-Head-Office-R2
+ISB-Head-Office-R2(config)#interface gigabitEthernet 0/0
+ISB-Head-Office-R2(config-if)#ip address 1.1.1.2 255.0.0.0
+ISB-Head-Office-R2(config-if)#no shutdown 
+ISB-Head-Office-R2(config)#interface gigabitEthernet 0/1
+ISB-Head-Office-R2(config-if)#ip address 2.2.2.1 255.0.0.0
+ISB-Head-Office-R2(config-if)#no shutdown 
+ISB-Head-Office-R2(config-if)#exit
+
+R1
+Router>enable  
+Router#configure terminal 
+Router(config)#hostname PES-Branch-Office-R1
+PES-Branch-Office-R1(config)#interface g0/0
+PES-Branch-Office-R1(config-if)#ip address 3.3.3.2 255.0.0.0
+PES-Branch-Office-R1(config-if)#no shutdown 
+PES-Branch-Office-R1(config-if)#exit 
+PES-Branch-Office-R1(config)#interface gigabitEthernet 0/1
+PES-Branch-Office-R1(config-if)#ip address 172.16.1.100 255.255.0.0
+PES-Branch-Office-R1(config-if)#no shutdown 
+PES-Branch-Office-R1(config-if)#exit
+
+R2
+Router>enable 
+Router#configure terminal 
+Router(config)#hostname PES-Branch-Office-R2
+PES-Branch-Office-R2(config)#interface g0/0
+PES-Branch-Office-R2(config-if)#ip address 2.2.2.2 255.0.0.0
+PES-Branch-Office-R2(config-if)#no shutdown 
+PES-Branch-Office-R2(config-if)#exit 
+PES-Branch-Office-R2(config)#interface gigabitEthernet 0/1
+PES-Branch-Office-R2(config-if)#ip address 3.3.3.1 255.0.0.0
+PES-Branch-Office-R2(config-if)#no shutdown 
+PES-Branch-Office-R2(config-if)#exit  
+
+OSPF on R1
+ISB-Head-Office-R1(config)#router ospf 100
+ISB-Head-Office-R1(config-router)#network 1.0.0.0 0.255.255.255 area 0
+
+OSPF on R2
+ISB-Head-Office-R2(config)#router ospf 100
+ISB-Head-Office-R2(config-router)#network 1.0.0.0 0.255.255.255 area 0
+ISB-Head-Office-R2(config-router)#network 2.0.0.0 0.255.255.255 area 0
+
+OSPF on R2
+PES-Branch-Office-R2(config)#router ospf 100
+PES-Branch-Office-R2(config-router)#network 3.0.0.0 0.255.255.255 area 0
+
+OSPF on R1
+PES-Branch-Office-R2(config)#router ospf 100
+PES-Branch-Office-R2(config-router)#network 2.0.0.0 0.255.255.255 area 0
+PES-Branch-Office-R2(config-router)#network 3.0.0.0 0.255.255.255 area 0
+
+
+GRE VPN Configuration
+
+ISB-Head-Office-R1(config-router)#int tunnel 0
+ISB-Head-Office-R1(config-if)#ip address 10.1.1.10 255.0.0.0
+ISB-Head-Office-R1(config-if)#no shutdown
+ISB-Head-Office-R1(config-if)#tunnel destination 10.1.1.11
+ISB-Head-Office-R1(config-if)#tunnel source g0/1
+ISB-Head-Office-R1(config-if)#tunnel destination 3.3.3.1
+ISB-Head-Office-R1(config-if)#tunnel mode gre ip 
+ISB-Head-Office-R1(config-if)#exit
+
+PES-Branch-Office-R1(config-router)#int tunnel 0
+PES-Branch-Office-R1(config-if)#ip address 10.1.1.11 255.0.0.0
+PES-Branch-Office-R1(config-if)#no shutdown
+PES-Branch-Office-R1(config-if)#tunnel destination 10.1.1.11
+PES-Branch-Office-R1(config-if)#tunnel source g0/1
+PES-Branch-Office-R1(config-if)#tunnel destination 1.1.1.1
+PES-Branch-Office-R1(config-if)#tunnel mode gre ip 
+PES-Branch-Office-R1(config-if)#exit
+
